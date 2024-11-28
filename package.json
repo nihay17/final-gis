@@ -1,0 +1,19 @@
+{
+  "name": "final-web-app",
+  "version": "1.0.0",
+  "description": "Web app for viewing tornadoes",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "tornadoes",
+    "GIS",
+    "ARCGIS"
+  ],
+  "author": "Niha Yadav",
+  "license": "ISC",
+  "dependencies": {
+    "@arcgis/core": "^4.31.6"
+  }
+}
