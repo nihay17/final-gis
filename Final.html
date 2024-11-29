@@ -1,41 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ArcGIS API for JavaScript Web App</title>
-  <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-    }
-    #viewDiv {
-      width: 100%;
-      height: 100%;
-    }
-  </style>
-  <script src="https://js.arcgis.com/4.18/"></script>
-  <script>
-    require([
-      "esri/Map",
-      "esri/views/MapView"
-    ], function(Map, MapView) {
-      var map = new Map({
-        basemap: "topo-vector"
-      });
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Display Web Map with TimeSlider</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/css/main.css">
+    <script src="https://js.arcgis.com/4.26/"></script>
 
-      var view = new MapView({
-        container: "viewDiv",
-        map: map,
-        center: [-118.2437, 34.0522], // Coordinates for Los Angeles
-        zoom: 10
+    <script>
+      require([
+        "esri/Map",
+        "esri/views/MapView",
+        "esri/WebMap",
+        "esri/widgets/Legend",
+        "esri/widgets/Home",
+        "esri/widgets/TimeSlider",
+        "dojo/domReady!"
+      ], function(Map, MapView, WebMap, Legend, Home, TimeSlider) {
+
+        // Initialize the WebMap using the URL of your ArcGIS Online Web Map
+        var webMap = new WebMap({
+          portalItem: { id: "087b0350552040a788bbc782ec0a163d" } // Your Web Map ID
+        });
+
+        var view = new MapView({
+          container: "viewDiv", // The ID of the div element
+          map: webMap,
+          zoom: 5,
+          center: [-98.5833, 39.8283] // Center the map over the US
+        });
+
+        // Add widgets
+        var homeWidget = new Home({
+          view: view
+        });
+
+        var legendWidget = new Legend({
+          view: view
+        });
+
+        var timeSliderWidget = new TimeSlider({
+          view: view
+        });
+
+        // Add widgets to the view
+        view.ui.add(homeWidget, "top-left");
+        view.ui.add(legendWidget, "bottom-left");
+        view.ui.add(timeSliderWidget, "bottom-right");  // Positioning the TimeSlider widget
+
+        // Check if the Web Map has time-enabled layers and update the TimeSlider accordingly
+        webMap.when(function() {
+          var timeLayer = view.map.layers.find(function(layer) {
+            return layer.timeInfo; // Check if any layer has time-related data
+          });
+
+          if (timeLayer) {
+            timeSliderWidget.startTime = timeLayer.timeInfo.fullTimeExtent.start;
+            timeSliderWidget.stopTime = timeLayer.timeInfo.fullTimeExtent.end;
+            timeSliderWidget.setThumbCount(2);  // Set two thumbs for a time range
+            timeSliderWidget.setLoop(true);  // Loop the time slider if you like
+          }
+        });
+
       });
-    });
-  </script>
-</head>
-<body>
-  <div id="viewDiv"></div>
-</body>
+    </script>
+  </head>
+
+  <body>
+    <div id="viewDiv" style="height:100%;"></div>
+  </body>
+
 </html>
